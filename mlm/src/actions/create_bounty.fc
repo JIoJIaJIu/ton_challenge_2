@@ -1,0 +1,12 @@
+;; Create bounty 
+() Action::create_bounty(slice in_msg) {
+}
+
+() Action::create_bounty_id() {
+}
+
+() Action::disable_bounty_id() {
+}
+
+() Action::() {
+}

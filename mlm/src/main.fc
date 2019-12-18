@@ -1,0 +1,42 @@
+#include "actions/upgrade_code";
+#include "actions/drop_data";
+#include "actions/create_bounty";
+
+() recv_external(slice in_msg) {
+  var signature = in_msg~load_bits(512);
+  var msg_hash = slice_hash(in_msg);
+  var seqno = in_msg~load_uint(32);
+
+  ;; data contains seqno + public_key
+  var ds = begin_parse(get_data());
+  var (stored_seqno, public_key) = (ds~load_uint(32), ds~load_uint(256));
+  ;; prevent replay
+  dump_stack();
+  throw_unless(33, stored_seqno == seqno);
+  throw_unless(34, check_signature(msg_hash, signature, public_key));
+  accept_message();
+
+  var action = in_msg~load_uint(4);
+  if (action == 1) {
+    Action::upgrade_code(in_msg);
+  } elseif (action == 2) {
+    Action::drop_data(in_msg);
+  } elseif (action == 4) {
+  } elseif (action == 3) {
+  } elseif (action == 5) {
+  } elseif (action == 6) {
+  } elseif (action == 7) {
+  } else {
+    throw(100);
+  }
+
+  set_data(
+    begin_cell()
+      .store_uint(stored_seqno + 1, 32)
+      .store_uint(public_key, 256)
+    .end_cell()
+  );
+}
+
+() recv_internal() {
+}

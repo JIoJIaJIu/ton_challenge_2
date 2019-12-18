@@ -16,7 +16,6 @@ error() {
   echo -e "\e[31mERROR:\e[0m $1" 1>&2
 }
 
-
 if [ -z `command -v func` ]; then
   error "func executable should be in PATH"
   HAS_ERROR=1
@@ -135,7 +134,7 @@ BASENAME=`basename -s .fc ${INPUT_FC}`
 OUTPUT_FIFT=${OUTPUT_DIR}/${BASENAME}.fif
 OUTPUT_ADDR=${OUTPUT_DIR}/${BASENAME}.addr
 OUTPUT_BOC=${OUTPUT_DIR}/${BASENAME}.boc
-LIB_DIR=${LIB_DIR:-"$SCRIPT_DIR"}
+LIB_DIR=${LIB_DIR:-"$SCRIPT_DIR/../lib/"}
 WC=${WC:--1}
 
 func -APS ${LIB_DIR}/stdlib.fc ${INPUT_FC} > $OUTPUT_FIFT
