@@ -137,7 +137,8 @@ OUTPUT_BOC=${OUTPUT_DIR}/${BASENAME}.boc
 LIB_DIR=${LIB_DIR:-"$SCRIPT_DIR/../lib/"}
 WC=${WC:--1}
 
-func -APS ${LIB_DIR}/stdlib.fc ${INPUT_FC} > $OUTPUT_FIFT
+INPUT_FC=$(bash ${SCRIPT_DIR}/parse_include.sh $INPUT_FC)
+func -APS ${LIB_DIR}/stdlib.fc <( echo "${INPUT_FC}") > $OUTPUT_FIFT
 
 cat >> $OUTPUT_FIFT <<EOF
   dup constant code
@@ -159,4 +160,4 @@ EOF
 if [ -n "$VERBOSE" ]; then
   cat $OUTPUT_FIFT
 fi
-fift -v3 $OUTPUT_FIFT
+fift -v3 -I${LIB_DIR} $OUTPUT_FIFT

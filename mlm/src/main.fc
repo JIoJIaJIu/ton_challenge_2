@@ -1,6 +1,14 @@
-#include "actions/upgrade_code";
 #include "actions/drop_data";
 #include "actions/create_bounty";
+#include "operations/upgrade_code";
+#include "operations/transfer";
+
+() dump_int(int value) impure {
+}
+() dump_cell(cell c) impure {
+}
+() dump_slice(slice s) impure {
+}
 
 () recv_external(slice in_msg) {
   var signature = in_msg~load_bits(512);
@@ -11,23 +19,20 @@
   var ds = begin_parse(get_data());
   var (stored_seqno, public_key) = (ds~load_uint(32), ds~load_uint(256));
   ;; prevent replay
-  dump_stack();
   throw_unless(33, stored_seqno == seqno);
   throw_unless(34, check_signature(msg_hash, signature, public_key));
   accept_message();
 
   var action = in_msg~load_uint(4);
   if (action == 1) {
-    Action::upgrade_code(in_msg);
+    Op::upgrade_code(in_msg);
   } elseif (action == 2) {
-    Action::drop_data(in_msg);
   } elseif (action == 4) {
   } elseif (action == 3) {
   } elseif (action == 5) {
   } elseif (action == 6) {
   } elseif (action == 7) {
   } else {
-    throw(100);
   }
 
   set_data(
@@ -38,5 +43,20 @@
   );
 }
 
-() recv_internal() {
+() recv_internal(int msg_value, cell in_msg_cell, slice in_msg) {
+  var cs = in_msg_cell.begin_parse();
+  var flags = cs~load_uint(4);  ;; int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+  if (flags & 1) {
+    ;; ignore all bounced messages
+    return ();
+  }
+  if (in_msg.slice_empty?()) {
+    return Op::transfer(in_msg, msg_value);
+  }
+
+  var op = in_msg~load_uint(32);
+  if (op == 0) {
+    return Op::transfer(in_msg, msg_value);
+  } elseif (op == 1) {
+  }
 }

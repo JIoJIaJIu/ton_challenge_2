@@ -1,6 +1,4 @@
-int Action::UpgradeCode() { return 1; }
-
-() Action::upgrade_code (slice in_msg) {
+() Op::upgrade_code (slice in_msg) {
   var new_code = in_msg~load_ref();
   in_msg.end_parse();
   set_code(new_code);

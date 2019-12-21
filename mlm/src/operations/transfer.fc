@@ -1,0 +1,33 @@
+() Op::transfer(slice s_addr, int msg_value) impure {
+}
+
+
+;;() Op::transfer1(slice s_addr, msg_value) {
+;;  var (elect, credits, past_elect, grams, active_id, active_hash) = load_data();
+;;  (int src_wc, int src_addr) = parse_std_addr(s_addr);
+;;  if (src_addr | (src_wc + 1) | (active_id == 0)) {
+;;    ;; simple transfer to us (credit "nobody's" account)
+;;    ;; (or no known active validator set)
+;;    grams += msg_value;
+;;    ;; return store_data(elect, credits, past_elect, grams, active_id, active_hash);
+;;  }
+;;  ;; zero source address -1:00..00 (collecting validator fees)
+;;  var (fs, f) = past_elect.udict_get?(32, active_id);
+;;  ifnot (f) {
+;;    ;; active validator set not found (?)
+;;    grams += msg_value;
+;;  } else {
+;;    ;; credit active validator set bonuses
+;;    var (data, hash, dict, total_stake, bonuses) = (fs~load_uint(64), fs~load_uint(256), fs~load_dict(), fs~load_grams(), fs~load_grams());
+;;    bonuses += msg_value;
+;;    past_elect~udict_set_builder(32, active_id, begin_cell()
+;;      .store_uint(data, 64)
+;;      .store_uint(hash, 256)
+;;      .store_dict(dict)
+;;      .store_grams(total_stake)
+;;      .store_grams(bonuses)
+;;      .store_slice(fs));
+;;  }
+;;  ;; store_data(elect, credits, past_elect, grams, active_id, active_hash);
+;;  return ();
+;;}

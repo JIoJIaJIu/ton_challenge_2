@@ -7,15 +7,34 @@
 # Variables: WC OUTPUT_PK
 # Functions: error
 #
-opts=`getopt -o h\
-      -l help \
+usage() {
+  echo
+  echo "MESSAGE_OPTIONS:"
+  echo "  -s,--source=hash             source wallet where the grams should be transfered to"
+}
+
+opts=`getopt -o h,s:\
+      -l help,source: \
       -- $@`
 
 eval set -- $opts
 while [[ $# -gt 0 ]]; do
   case $1 in
     -h|--help)
+      usage
       exit
+      ;;
+    -s|--source)
+      # ADDR=(`IFS=":"; echo $2`)
+
+      #if [ ${#ADDR[@]} -ne 2 ]; then
+      #  error "Wrong format of the resource $2. MUST be wc:addr"
+      #  exit 1
+      #fi
+      #shift 2
+      SOURCE=$2
+      shift 2
+      break
       ;;
     *)
       break
@@ -23,6 +42,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 shift
+
+if [ -z "$SOURCE" ]; then
+  error "MUST provide source smartcontract, check -h"
+  exit 1
+fi
 
 if [ -f "$OUTPUT_ADDR" ]; then
   error "$OUTPUT_ADDR file already exists, it cannot be overwritten"
@@ -36,7 +60,9 @@ cat <<EOF
     0 32 u, // seqno
     "${OUTPUT_PK}" load-generate-keypair constant wallet_pk dup constant public_key
     B, // public key
-    null dict,
+    b{001} s, "${SOURCE}" $>smca 2drop addr,
+    <b b{0} s, b> ref,
+    <b null dict, b> ref,
   b> swap
 
   cr ."-- FIFT extension --" cr cr
