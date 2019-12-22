@@ -5,10 +5,15 @@
 
 // Constants
 dup constant code
+-1 0x2222222222222222222222222222222222222222222222222222222222222222 2constant addr2
 "/tmp/test.pk" load-generate-keypair constant wallet_pk constant public_key
 <b 0 32 u, 1 4 u, code ref, b> constant data
 data hashu wallet_pk ed25519_sign_uint constant signature
-<b 0 32 u, public_key B, null dict, b> constant c4
+<b 0 32 u,
+   public_key B,
+   b{001} s,
+   addr2 addr,
+b> constant c4
 
 // first upgrade
 <b signature B, data <s s, b>

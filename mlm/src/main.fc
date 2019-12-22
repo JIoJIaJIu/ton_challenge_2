@@ -1,7 +1,6 @@
-#include "actions/drop_data";
-#include "actions/create_bounty";
 #include "operations/upgrade_code";
 #include "operations/transfer";
+#include "utils";
 
 () dump_int(int value) impure {
 }
@@ -27,18 +26,18 @@
   if (action == 1) {
     Op::upgrade_code(in_msg);
   } elseif (action == 2) {
-  } elseif (action == 4) {
-  } elseif (action == 3) {
-  } elseif (action == 5) {
-  } elseif (action == 6) {
-  } elseif (action == 7) {
-  } else {
   }
 
+  var skip = ds~load_uint(3); ;; TODO ~load_msg_addr()
+  var source_workchain = ds~load_int(8);
+  var source_address = ds~load_uint(256);
   set_data(
     begin_cell()
       .store_uint(stored_seqno + 1, 32)
       .store_uint(public_key, 256)
+      .store_uint(skip, 3)
+      .store_int(source_workchain, 8)
+      .store_int(source_address, 256)
     .end_cell()
   );
 }
@@ -51,12 +50,19 @@
     return ();
   }
   if (in_msg.slice_empty?()) {
-    return Op::transfer(in_msg, msg_value);
+    return ();
   }
 
   var op = in_msg~load_uint(32);
   if (op == 0) {
     return Op::transfer(in_msg, msg_value);
-  } elseif (op == 1) {
   }
+}
+
+int seqno() method_id {
+  return get_data().begin_parse().preload_uint(32);
+}
+
+_ source_address() method_id {
+  return get_source_address();
 }

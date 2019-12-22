@@ -1,0 +1,7 @@
+(int, int) get_source_address() {
+  var ds = get_data().begin_parse();
+  var a = ds~load_uint(32);
+  var b = ds~load_uint(256);
+  var c = ds~load_uint(3);
+  return (ds~load_int(8), ds~load_int(256));
+}

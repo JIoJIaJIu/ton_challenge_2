@@ -85,7 +85,7 @@ if [ -z "${INPUT_MESSAGE}" ]; then
   exit 1
 fi
 
-INPUT_FC=$(bash ${SCRIPT_DIR}/parse_include.sh $INPUT_FC)
+INPUT_FC=$(bash ${SCRIPT_DIR}/preprocess/parse_include.sh $INPUT_FC)
 func -AP ${LIB_DIR}/stdlib.fc <(echo "$INPUT_FC") | tee $OUTPUT_FIFT
 if [ $? -ne 0 ]; then
   echo "ERROR: Unable to read input file"

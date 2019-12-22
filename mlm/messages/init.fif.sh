@@ -25,13 +25,6 @@ while [[ $# -gt 0 ]]; do
       exit
       ;;
     -s|--source)
-      # ADDR=(`IFS=":"; echo $2`)
-
-      #if [ ${#ADDR[@]} -ne 2 ]; then
-      #  error "Wrong format of the resource $2. MUST be wc:addr"
-      #  exit 1
-      #fi
-      #shift 2
       SOURCE=$2
       shift 2
       break
@@ -55,6 +48,7 @@ fi
 
 cat <<EOF
   "TonUtil.fif" include
+  // "${SOURCE}" $>smca 2drop .s
 
   <b
     0 32 u, // seqno

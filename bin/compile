@@ -44,6 +44,7 @@ usage() {
   echo "  -k, --key=file               file with private key"
   echo "                                 default=output.pk"
   echo "  -v, --verbose                verbose all generated files"
+  echo "      --skip-fc                doesnt include fc in the output"
   echo "  -h, --help                   display this help and exit"
 }
 
@@ -75,7 +76,8 @@ while [[ $# -gt 0 ]]; do
       ;;
     -l|--lib)
       LIB_DIR=$2
-      shift
+     jsh
+      ift
       ;;
     -m|--message)
       MESSAGE=$2
@@ -87,6 +89,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -h|--help)
       SHOW_HELP=1
+      shift
+      ;;
+    --skip-fc)
+      SKIP_FC=1
       shift
       ;;
     -*)
@@ -137,13 +143,16 @@ OUTPUT_BOC=${OUTPUT_DIR}/${BASENAME}.boc
 LIB_DIR=${LIB_DIR:-"$SCRIPT_DIR/../lib/"}
 WC=${WC:--1}
 
-INPUT_FC=$(bash ${SCRIPT_DIR}/parse_include.sh $INPUT_FC)
-func -APS ${LIB_DIR}/stdlib.fc <( echo "${INPUT_FC}") > $OUTPUT_FIFT
+INPUT_FC=$(bash ${SCRIPT_DIR}/preprocess/parse_include.sh $INPUT_FC)
+if [ $SKIP_FC != 1 ]; then
+  func -APS ${LIB_DIR}/stdlib.fc <( echo "${INPUT_FC}") > $OUTPUT_FIFT
 
-cat >> $OUTPUT_FIFT <<EOF
-  dup constant code
+  cat >> $OUTPUT_FIFT <<EOF
+dup constant code
 EOF
-
+else
+  echo -n > $OUTPUT_FIFT
+fi
 
 # Get Message X
 source "$MESSAGE" >> $OUTPUT_FIFT

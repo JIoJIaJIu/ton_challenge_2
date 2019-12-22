@@ -1,33 +1,53 @@
-() Op::transfer(slice s_addr, int msg_value) impure {
+#include "../utils.fc";
+
+(int) send_bounty(slice in_msg, int msg_value) impure {
+  var ff = in_msg~load_uint(8);
+  if (ff != 0xff) {
+    return msg_value;
+  }
+  var ref = in_msg~load_slice(8 + 256);
+
+  var message_int = begin_cell()
+      ;; 0100 int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+      .store_uint(4, 4)
+      ;; src:MsgAddressInt addr_none$00 
+      .store_uint(0, 2)
+      ;; dest:MsgAddressInt addr_std$10 anycast:(Maybe Anycast)
+      .store_uint(4, 3)
+      ;; workchain_id:int8 address:bits256
+      .store_int(workchain_id, 8)
+      .store_int(address, 256)
+      ;; value:CurrencyCollection
+      .store_grams(msg_value)
+      ;; ihr_fee:Grams fwd_fee:Grams created_lt:uint64 created_at:uint32
+      .store_uint(0, 9 + 64 + 32)
+      ;; init:(..) body(..)
+      .store_uint(0, 2)
+      .store_uint(0, 5)
+    .end_cell();
+  send_raw_message(message_int, 0);
 }
 
-
-;;() Op::transfer1(slice s_addr, msg_value) {
-;;  var (elect, credits, past_elect, grams, active_id, active_hash) = load_data();
-;;  (int src_wc, int src_addr) = parse_std_addr(s_addr);
-;;  if (src_addr | (src_wc + 1) | (active_id == 0)) {
-;;    ;; simple transfer to us (credit "nobody's" account)
-;;    ;; (or no known active validator set)
-;;    grams += msg_value;
-;;    ;; return store_data(elect, credits, past_elect, grams, active_id, active_hash);
-;;  }
-;;  ;; zero source address -1:00..00 (collecting validator fees)
-;;  var (fs, f) = past_elect.udict_get?(32, active_id);
-;;  ifnot (f) {
-;;    ;; active validator set not found (?)
-;;    grams += msg_value;
-;;  } else {
-;;    ;; credit active validator set bonuses
-;;    var (data, hash, dict, total_stake, bonuses) = (fs~load_uint(64), fs~load_uint(256), fs~load_dict(), fs~load_grams(), fs~load_grams());
-;;    bonuses += msg_value;
-;;    past_elect~udict_set_builder(32, active_id, begin_cell()
-;;      .store_uint(data, 64)
-;;      .store_uint(hash, 256)
-;;      .store_dict(dict)
-;;      .store_grams(total_stake)
-;;      .store_grams(bonuses)
-;;      .store_slice(fs));
-;;  }
-;;  ;; store_data(elect, credits, past_elect, grams, active_id, active_hash);
-;;  return ();
-;;}
+() Op::transfer(slice in_msg, int msg_value) impure {
+  var grams = send_bounty(in_msg, msg_value);
+  var (workchain_id, address) = get_source_address();
+  var message_int = begin_cell()
+      ;; 0100 int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+      .store_uint(4, 4)
+      ;; src:MsgAddressInt addr_none$00 
+      .store_uint(0, 2)
+      ;; dest:MsgAddressInt addr_std$10 anycast:(Maybe Anycast)
+      .store_uint(4, 3)
+      ;; workchain_id:int8 address:bits256
+      .store_int(workchain_id, 8)
+      .store_int(address, 256)
+      ;; value:CurrencyCollection
+      .store_grams(grams)
+      ;; ihr_fee:Grams fwd_fee:Grams created_lt:uint64 created_at:uint32
+      .store_uint(0, 9 + 64 + 32)
+      ;; init:(..) body(..)
+      .store_uint(0, 2)
+      .store_uint(0, 5)
+    .end_cell();
+  send_raw_message(message_int, 0);
+}

@@ -24,7 +24,13 @@ case $COMMAND in
     ${command}
     ;;
   upgrade)
-    command="${EXEC} -o $OUTPUT_DIR/1 -k ${OUTPUT_DIR}/${PK} $INPUT_FC -a $OUTPUT_DIR/dns.addr -m messages/upgrade-scm.fif.sh $@"
+    command="${EXEC} -o $OUTPUT_DIR/1 -k ${OUTPUT_DIR}/${PK} $INPUT_FC -a $OUTPUT_DIR/main.addr -m messages/upgrade-scm.fif.sh $@"
+    print_command "$command"
+    echo
+    ${command}
+    ;;
+  transfer)
+    command="${EXEC} -o $OUTPUT_DIR/1 $INPUT_FC -m messages/transfer.fif.sh --skip-fc $@"
     print_command "$command"
     echo
     ${command}
@@ -39,10 +45,12 @@ case $COMMAND in
     echo Usage: ./build COMMAND
     echo
     echo COMMANDS:
-    echo "  init OPTIONS                create initialization message"
+    echo "  init OPTIONS...             create initialization message"
     echo "                                OPTIONS: ./build.sh init -h"
-    echo "  upgrade [OPTIONS]...        create upgrade code message [DANGER]"
+    echo "  upgrade OPTIONS...          create upgrade code message [DANGER]"
     echo "                                OPTIONS: ./build.sh upgrade -h"
+    echo "  transfer OPTIONS...         create transfer grams message"
+    echo "                                OPTIONS: ./build.sh transfer -h"
     echo
     echo "  help                        reads this message"
 

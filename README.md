@@ -1,3 +1,3 @@
 # Telegram BlockChain contest, II part
 
-* [Bounty](bounty/README.md)
+* [mlm](mlm/README.md)

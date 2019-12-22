@@ -1,14 +1,28 @@
 ## MLM Smarcontract
 
-The smartcontract provides hierahical bounty for the payments
+The smartcontract provides hierahical bounty for the payments. It can be used for creating referal programs and support MLM (multi-level marketing) structure (not implemented).  
+
+Smartcontract works as simple wallet and accept simple transfer message where in binary comment (0xff) the referral address exists. After processing amount of Grams is transfered to the source wallet minus referral bounty if referral address exists. The referral address and his parent (and parent of the parent, depends on scm configs) earns its part
 
 ### How to
 
-* `./build.sh`
-* `./test.sh`
+* `./build.sh -h`
+* `./test.sh -h`
 
+#### How to init
 
-Smartcontract works as simple wallet and accept simple transfer message where in binary comment (0xff) the referral address exists. After processing amount of Gram is transfered to the source wallet minus referral fee if referral address exists and found in the scm data. Also the referral address and his parent (and parent of the parent, depends on scm configs) earns 
+* `./build.sh init -s addr`   
+  where  
+  `addr` is the wallet where the grams minus bounties should be transfered
+
+#### How to transfer grams from existed wallet
+
+* `./build.sh transfer -f from_addr -k from_addr.pk -s scm_addr --amount grams --ref ref_addr`  
+  where   
+  `from_addr` - your wallet addr  
+  `from_addr.pk` - your wallet private key for subscribing external request  
+  `scm_addr` - this smarconctract scm  
+  `ref_addr` - referral addr  
 
 ### Smarcontracts Plans
 
@@ -67,10 +81,6 @@ message_body$_ operation:$0
 
 ### External Messages
 
-**StateInit**
-```
-```
-
 **MessageUpgrade**
 ```
 upgrade_action$0001: ActionUpgrade
@@ -78,12 +88,4 @@ ext_message_body$_
   seqno: uint32
   action: ActionUpgrade
   code: ^Cell = MessageUpgrade;
-```
-
-**MessageDropData**
-```
-upgrade_action$0010: ActionDropData
-ext_message_body$_
-  seqno: uint32
-  action: ActionDropData = MessageDropData
 ```

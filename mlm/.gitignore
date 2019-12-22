@@ -1,0 +1,8 @@
+# scm folders
+[1-9]/
+wc_[1-9]/
+[1-9]_my_scm/
+_[1-9]/
+build/
+
+scripts/

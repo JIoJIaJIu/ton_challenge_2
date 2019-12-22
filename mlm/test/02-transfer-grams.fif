@@ -1,0 +1,42 @@
+"TonUtil.fif" include
+
+constant code
+"/tmp/test.pk" load-generate-keypair constant wallet_pk constant public_key
+<b 0 32 u, 1 4 u, code ref, b> constant data
+data hashu wallet_pk ed25519_sign_uint constant signature
+<b 0 32 u, public_key B, b> constant c4
+
+// addr_std$10 anycast:(Maybe Anycast) 
+//    workchain_id:int8 address:bits256  = MsgAddressInt;
+<b b{100} s, -1 8 i, 0 256 u, b> <s constant dest_addr
+
+// Message X
+// 
+// int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+//   src:MsgAddressInt dest:MsgAddressInt 
+//   value:CurrencyCollection ihr_fee:Grams fwd_fee:Grams
+//   created_lt:uint64 created_at:uint32 = CommonMsgInfo;
+// message$_ {X:Type} info:CommonMsgInfo
+//   init:(Maybe (Either StateInit ^StateInit))
+//   body:(Either X ^X) = Message X;
+{
+  <b
+    b{0100} s,           // int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
+    b{00} s,             // src:MsgAddressInt addr_none$00 
+    b{100} s, swap s,    // dest:MsgAddressInt
+    swap Gram,           // value:CurrencyCollection
+    0 9 u,               // ihr_fee:Grams fwd_fee:Grams
+    0 64 u,              // created_lt:uint64
+    0 32 u,              // created_at:uint32
+    b{00} s,             // init:(..) body(..)
+    swap s,
+  b>
+} : create_msg_int
+// (bin_comment amount dest_addr -- body)
+
+// <b signature B, data <s s, b>
+<b 0 32 u, b> constant body
+10
+body <s 100 dest_addr create_msg_int
+body <s
+0 code <s c4 runvm
