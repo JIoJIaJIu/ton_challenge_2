@@ -2,13 +2,6 @@
 #include "operations/transfer";
 #include "utils";
 
-() dump_int(int value) impure {
-}
-() dump_cell(cell c) impure {
-}
-() dump_slice(slice s) impure {
-}
-
 () recv_external(slice in_msg) {
   var signature = in_msg~load_bits(512);
   var msg_hash = slice_hash(in_msg);

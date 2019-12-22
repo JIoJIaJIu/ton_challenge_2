@@ -86,22 +86,24 @@ SEQNO=${SEQNO:-0}
 cat <<EOF
   "TonUtil.fif" include
   ."Request to transfer ${AMOUNT} grams from ${FROM} to ${SCM} with ref:${REF}" cr cr
+  true constant bounce
   "$OUTPUT_PK" load-keypair constant wallet_pk drop
   "$FROM" $>smca 0 = { 1 halt } if drop 2constant addr
-  "$SCM" $>smca 0 = { 1 halt } if drop 2constant dest_addr
+  "$SCM" bounce parse-load-address =: bounce 2=: dest_addr
   "$REF" $>smca 0 = { 1 halt } if drop 2constant ref_addr
 
   <b
     b{01} s,
-    0 1 i,
+    bounce 1 i,
     b{000100} s,
     dest_addr addr,
     "${AMOUNT}" $>GR Gram,
     0 9 64 32 + + 1+ 1+ u,
-    1 32 u,
+    0 32 u,
+    b{11111111} s,
     ref_addr addr,
   b>
-  <b ${SEQNO} 32 u, 1 8 u, swap ref, b>
+  <b ${SEQNO} 32 u, 3 8 u, swap ref, b>
   dup ."Signing message: " <s csr. cr
   dup hash wallet_pk ed25519_sign_uint
 
@@ -121,5 +123,6 @@ cat <<EOF
     b{0} s,                // body:(Either X ^X)
       swap B, swap <s s,
   b>
+  cr
   dup <s ."Transfer Message:" cr csr.
 EOF

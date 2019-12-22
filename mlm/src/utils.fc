@@ -5,3 +5,5 @@
   var c = ds~load_uint(3);
   return (ds~load_int(8), ds~load_int(256));
 }
+
+int size(slice s) asm "SBITS";

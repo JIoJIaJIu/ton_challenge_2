@@ -144,7 +144,7 @@ LIB_DIR=${LIB_DIR:-"$SCRIPT_DIR/../lib/"}
 WC=${WC:--1}
 
 INPUT_FC=$(bash ${SCRIPT_DIR}/preprocess/parse_include.sh $INPUT_FC)
-if [ $SKIP_FC != 1 ]; then
+if [[ $SKIP_FC != 1 ]]; then
   func -APS ${LIB_DIR}/stdlib.fc <( echo "${INPUT_FC}") > $OUTPUT_FIFT
 
   cat >> $OUTPUT_FIFT <<EOF

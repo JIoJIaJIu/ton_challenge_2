@@ -2,11 +2,17 @@
 
 (int) send_bounty(slice in_msg, int msg_value) impure {
   var ff = in_msg~load_uint(8);
-  if (ff != 0xff) {
-    return msg_value;
-  }
-  var ref = in_msg~load_slice(8 + 256);
+  ;; if (ff != 0xff) {
+  ;;  return msg_value;
+  ;;}
+  ;;if (in_msg.size() < 8 + 256 + 8) {
+  ;;  return msg_value;
+  ;;}
 
+  var bounty = msg_value / 100; ;; 1%
+  ;; var ref = in_msg~load_slice(8 + 256);
+  var workchain_id = in_msg~load_int(8);
+  var address = in_msg~load_int(256);
   var message_int = begin_cell()
       ;; 0100 int_msg_info$0 ihr_disabled:Bool bounce:Bool bounced:Bool
       .store_uint(4, 4)
@@ -18,7 +24,7 @@
       .store_int(workchain_id, 8)
       .store_int(address, 256)
       ;; value:CurrencyCollection
-      .store_grams(msg_value)
+      .store_grams(bounty)
       ;; ihr_fee:Grams fwd_fee:Grams created_lt:uint64 created_at:uint32
       .store_uint(0, 9 + 64 + 32)
       ;; init:(..) body(..)
@@ -26,6 +32,7 @@
       .store_uint(0, 5)
     .end_cell();
   send_raw_message(message_int, 0);
+  return (msg_value - bounty);
 }
 
 () Op::transfer(slice in_msg, int msg_value) impure {
